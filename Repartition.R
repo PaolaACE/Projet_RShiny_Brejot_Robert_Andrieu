@@ -31,8 +31,8 @@ summary(data)
 #emplois_a_temps_plein 
 #salaire_net_median_des_emplois_a_temps_plein
 #salaire_brut_annuel_estime
-# de_diplomes_boursiers
-# taux_de_chomage_regional
+#de_diplomes_boursiers
+#taux_de_chomage_regional
 #salaire_net_mensuel_median_regional
 #emploi_cadre
 #emplois_exterieurs_a_la_region_de_luniversite
