@@ -16,7 +16,8 @@ fluidPage(
     title = "Etude de l'insertion après l'obtention d'un diplome",
     tabPanel(
       title = "Présentation",
-      dataTableOutput(outputId = "dataTable")
+      dataTableOutput(outputId = "dataTable"),
+      leafletOutput("mymap", width = "100%", height = 600)
     ),
     
     tabPanel(
