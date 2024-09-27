@@ -1,17 +1,18 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    https://shiny.posit.co/
-#
-library(data.table)
-library(shiny)
+source("Import_donnees.R")
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
-  data <- fread(file = "fr-esr-insertion_professionnelle-master.csv", 
-                header = TRUE, sep = ";", stringsAsFactors = TRUE)
   output$dataTable <- renderDataTable(data)
+  output$salaire_ac <- renderPlot({
+    ggplot(data, aes(x = academie, y = salaire_brut_annuel_estime, fill = academie)) +
+      geom_bar(stat = "identity") +
+      labs(title = "Salaire brut annuel estimé par académie", x = "Académie", y = "Salaire brut annuel (€)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+  output$rep_salaires <- renderPlot({
+    ggplot(data, aes(x = salaire_net_median_des_emplois_a_temps_plein)) +
+      geom_histogram(binwidth = 50, fill = "blue", color = "white") +
+      labs(title = "Distribution des salaires nets médians des emplois à temps plein",
+           x = "Salaire net médian (€)", y = "Fréquence")
+  })
 }

@@ -1,13 +1,6 @@
-#
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    https://shiny.posit.co/
-#
-
 library(shiny)
+
+
 
 # Define UI for application that draws a histogram
 fluidPage(
@@ -16,7 +9,15 @@ fluidPage(
     title = "Etude de l'insertion après l'obtention d'un diplome",
     tabPanel(
       title = "Présentation",
-      dataTableOutput(outputId = "dataTable")
+      sidebarLayout(
+        sidebarPanel(
+          checkboxGroupInput(inputId = "var", label = "Variables : ", choices = colnames(data))
+        ),
+        mainPanel(
+          dataTableOutput(outputId = "dataTable")
+        )
+      ),
+      
     ),
     
     tabPanel(
@@ -26,10 +27,15 @@ fluidPage(
     navbarMenu(
       title = "Salaires",
       tabPanel(
-        title = "Par domaines"
+        title = "Par académie",
+        plotOutput("salaire_ac")
       ),
       tabPanel(
         title = "Par emploi"
+      ),
+      tabPanel(
+        title = "Répartition des salaires",
+        plotOutput("rep_salaires")
       )
     )
   )
