@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(leaflet)
 
 # Define UI for application that draws a histogram
 fluidPage(
@@ -21,7 +22,11 @@ fluidPage(
     ),
     
     tabPanel(
-      title = "Emplois par domaines"
+      title = "Evolution temporelle",
+      checkboxGroupInput("academie", "Choisir les academies : ",
+                         choices = unique(data$academie),
+                         selected = unique(data$academie)[1]),
+      plotOutput("evolutionPlot")
     ),
     
     navbarMenu(
