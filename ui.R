@@ -23,10 +23,17 @@ fluidPage(
     
     tabPanel(
       title = "Evolution temporelle",
-      checkboxGroupInput("academie", "Choisir les academies : ",
-                         choices = unique(data$academie),
-                         selected = unique(data$academie)[1]),
+      selectInput("academie", "Choisir les academies : ",
+                  choices = unique(data2$academie),
+                  selected = "Rennes",
+                  multiple = T),
+      
+      selectInput("variable", "Choisir la variable : ",
+                choices = list("salaire_brut_annuel_estime", "taux_de_reponse"),
+                selected = "salaire_brut_annuel_estime"),
+      
       plotOutput("evolutionPlot")
+      
     ),
     
     navbarMenu(

@@ -36,15 +36,15 @@ df <- data %>% group_by(academie) %>%
 df <- df[2:30,]
 df$academie <- as.character(df$academie)
 
-df <- df %>%
-  geocode(academie, method = 'osm', full_results = TRUE)
+# df <- df %>%
+#   geocode(academie, method = 'osm', full_results = TRUE)
 
-df <- df[,1:5]
+#df <- df[,1:5]
 
 ### Preparation données graphes temporelles ###
 
-data2 <- data[!is.na(salaire_brut_annuel_estime)]
-data2 <- data2 %>% group_by(annee, academie) %>% summarise(salaire_brut_annuel_estime = mean(salaire_brut_annuel_estime))
+# data2 <- data[!is.na(salaire_brut_annuel_estime)]
+# data2 <- data2 %>% group_by(annee, academie) %>% summarise(salaire_brut_annuel_estime = mean(salaire_brut_annuel_estime))
 
 
 
@@ -52,24 +52,33 @@ data2 <- data2 %>% group_by(annee, academie) %>% summarise(salaire_brut_annuel_e
 function(input, output, session) {
   output$dataTable <- renderDataTable(data)
   
-  output$mymap <- renderLeaflet({
-    leaflet(df) %>%
-      addTiles() %>%
-      setView(lng = 2.2137, lat = 46.2276, zoom = 6) %>% 
-      addCircleMarkers(
-        lng = ~long,
-        lat = ~lat,
-        radius = 6,
-        color = "blue",
-        fillOpacity = 0.8,
-        popup = ~paste("<strong>Académie :</strong>", academie, "<br>",
-                       "<strong>Taux de réponse moyen :</strong>", round(taux_reponse_totale), "%", "<br>",
-                       "<strong>Taux d'insertion moyen :</strong>", round(taux_insertion_moyen), "%")
-      )
-  })
+  # output$mymap <- renderLeaflet({
+  #   leaflet(df) %>%
+  #     addTiles() %>%
+  #     setView(lng = 2.2137, lat = 46.2276, zoom = 6) %>% 
+  #     addCircleMarkers(
+  #       lng = ~long,
+  #       lat = ~lat,
+  #       radius = 6,
+  #       color = "blue",
+  #       fillOpacity = 0.8,
+  #       popup = ~paste("<strong>Académie :</strong>", academie, "<br>",
+  #                      "<strong>Taux de réponse moyen :</strong>", round(taux_reponse_totale), "%", "<br>",
+  #                      "<strong>Taux d'insertion moyen :</strong>", round(taux_insertion_moyen), "%")
+  #     )
+  # })
   
   output$evolutionPlot <- renderPlot({
-    filtered_data <- data2 %>% filter(academie %in% list("Rennes","Lyon"))
+    if (input$variable == "salaire_brut_annuel_estime"){
+      data2 <- data[!is.na(salaire_brut_annuel_estime)]
+      data2 <- data2 %>% group_by(annee, academie) %>% summarise(salaire_brut_annuel_estime = mean(salaire_brut_annuel_estime))
+    }
+    else if (input$variable == "taux_d_insertion"){
+      data2 <- data[!is.na(taux_d_insertion)]
+      data2 <- data2 %>% group_by(annee, academie) %>% summarise(taux_d_insertion = mean(taux_d_insertion))
+    }
+    
+    filtered_data <- data2 %>% filter(academie %in% input$academie)
     
     ggplot(filtered_data, aes(x=annee, y=salaire_brut_annuel_estime, color=academie)) +
       geom_line(size=1) +
