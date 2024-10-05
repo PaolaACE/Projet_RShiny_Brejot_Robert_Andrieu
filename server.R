@@ -1,11 +1,5 @@
 #
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    https://shiny.posit.co/
-#
+
 library(data.table)
 library(shiny)
 
@@ -31,30 +25,34 @@ function(input, output, session) {
   
   dta_trie <- dta_trie[etablissement != "Toutes universités et établissements assimilés"]
 
-  #
-  # a1 <- reactive({input$an[1]})
-  # a2 <- reactive({input$an[2]})
-  # for (a in a1:a2){
-  #   print(a)
-  #   dta_a <- dta_trie[year==a]
-  #   mod <- glm(input$Y ~ input$geo + input$sujet + femmes +
-  #                input$geo:input$sujet +
-  #                input$geo:femmes+
-  #                input$sujet:femmes, data = dta_a)
-  #   res.aov <- c(res.aov, 
-  #                summary(Anova(mod, type = "III")))
-  
-  a <- reactive({input$an[1]})
-  geo <- reactive({input$geo})
-  sujet <- reactive({input$sujet})
-  Y <- reactive({input$Y})
+  observeEvent(input$Go, {
+    # a1 <- reactive({input$an[1]})
+    # a2 <- reactive({input$an[2]})
+    # for (a in a1:a2){
+    #   print(a)
+    #   dta_a <- dta_trie[year==a]
+    #   mod <- glm(input$Y ~ input$geo + input$sujet + femmes +
+    #                input$geo:input$sujet +
+    #                input$geo:femmes+
+    #                input$sujet:femmes, data = dta_a)
+    #   res.aov <- c(res.aov, 
+    #                summary(Anova(mod, type = "III")))
+    
+    a <- as.character(reactive({input$an[1]}))
+    geog <- reactive({input$geo})
+    sujet <- as.character(reactive({input$sujet}))
+    Y <- as.character(reactive({input$Y}))
 
-  print(a)
-  mod <- glm(Y ~ geo + sujet + femmes +
-                geo:sujet +
-                geo:femmes+
-                sujet:femmes, data = dta_trie)
-  res.aov <- summary(Anova(mod, type = "III"))
+    print(a)
+    mod <- glm(Y ~ geo + sujet + femmes +
+                  geo:sujet +
+                  geo:femmes+
+                  sujet:femmes, data = dta_trie)
+    res.aov <- summary(Anova(mod, type = "III"))
+    
+    
+    output$aov <- renderPrint({res.aov})
+    
+  })
 
-  output$aov <- renderPrint({res.aov})
 }

@@ -69,7 +69,11 @@ fluidPage(
             min = 2010, 
             max = 2020, 
             round = TRUE, 
-            step = 1, 
+            step = 1
+          ), 
+          actionButton(
+            inputId = "Go", 
+            label = "Lancer les analyses"
           )
         ), 
         sidebarPanel(
