@@ -30,16 +30,31 @@ function(input, output, session) {
   #on retire les lignes "résumées" car elles biaiseront l'analyse
   
   dta_trie <- dta_trie[etablissement != "Toutes universités et établissements assimilés"]
-  output$dataTable <- renderDataTable(data)
+
+  #
+  # a1 <- reactive({input$an[1]})
+  # a2 <- reactive({input$an[2]})
+  # for (a in a1:a2){
+  #   print(a)
+  #   dta_a <- dta_trie[year==a]
+  #   mod <- glm(input$Y ~ input$geo + input$sujet + femmes +
+  #                input$geo:input$sujet +
+  #                input$geo:femmes+
+  #                input$sujet:femmes, data = dta_a)
+  #   res.aov <- c(res.aov, 
+  #                summary(Anova(mod, type = "III")))
   
-  for (a in input$an[1]:input$an[2]){
-    print(a)
-    mod <- glm(input$Y ~ input$geo + input$sujet + femmes +
-                 input$geo:input$sujet +
-                 input$geo:femmes+
-                 input$sujet:femmes, data = dta)
-    res.aov <- c(res.aov, "annee suuviante", 
-                 summary(Anova(mod, type = "III")))
-  }
-  output$res.aov <- res.aov
+  a <- reactive({input$an[1]})
+  geo <- reactive({input$geo})
+  sujet <- reactive({input$sujet})
+  Y <- reactive({input$Y})
+
+  print(a)
+  mod <- glm(Y ~ geo + sujet + femmes +
+                geo:sujet +
+                geo:femmes+
+                sujet:femmes, data = dta_trie)
+  res.aov <- summary(Anova(mod, type = "III"))
+
+  output$aov <- renderPrint({res.aov})
 }
