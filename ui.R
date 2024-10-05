@@ -66,10 +66,26 @@ dashboardPage(
       tabItem(
         tabName = "salaire",
         fluidRow(
-          box(title = "Salaires par académie",collapsible = TRUE, collapsed = TRUE,
-            width = 12, plotOutput("salaire_ac")),
+          box(
+            width = 3,
+            selectInput(
+              inputId = "varfac", label = "Sélectionnez la variable en abscisse :",
+              choices = colnames(data)[sapply(data, is.factor)],
+              selected = "domaine"
+            )
+          ),
+          box(
+            width = 5,
+            selectInput(
+              inputId = "salaire", label = "Sélectionnez le type de salaire :",
+              choices = c("salaire_brut_annuel_estime", "salaire_net_median_des_emplois_a_temps_plein"),
+              selected = "salaire_net_median_des_emplois_a_temps_plein"
+            )
+          ),
+          box(title = "Salaires par variables catégorielles" ,collapsible = TRUE, collapsed = TRUE,
+              width = 12, plotOutput("salaire_ac")),
           box(title = "Répartition des salaires", collapsible = TRUE, collapsed = TRUE,
-            width = 12, plotOutput("rep_salaires"))
+              width = 12, plotOutput("rep_salaires"))
         )
       )
     )

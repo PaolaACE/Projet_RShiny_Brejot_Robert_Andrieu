@@ -9,7 +9,7 @@ data <- fread(file = "fr-esr-insertion_professionnelle-master.csv",
 data[data == 'ns'] = NA
 data[data == 'nd'] = NA
 
-data[, (14:32) := lapply(.SD, as.numeric), .SDcols = 14:32]
+data[, c(1,14:32) := lapply(.SD, as.numeric), .SDcols = c(1,14:32)]
 data[, (2:13) := lapply(.SD, as.factor), .SDcols = (2:13)]
 data[, (33:35) := lapply(.SD, as.factor), .SDcols = (33:35)]
 
