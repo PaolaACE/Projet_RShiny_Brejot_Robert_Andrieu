@@ -2,6 +2,7 @@
 
 library(data.table)
 library(shiny)
+library(car)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
@@ -56,16 +57,16 @@ function(input, output, session) {
     YA <- reactive({input$Y})
     y <- as.numeric(YA())
     Y <- dta_trie[,..y][[1]]
+    Y <- as.numeric(Y)
     
     F <- dta_trie$femmes
     
-    mod <- lm(Y~G + S + F +
-                 G:S + G:F + S:F +
-                 G:S:F)
+    mod <- lm(Y~G + S +
+                 G:S )
     res.aov <- summary(Anova(mod, type = "III"))
     
 
-    output$aov <- renderPrint({res.aov})
+    output$aov <- renderPrint({summary(F)})
     
   })
 
