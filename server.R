@@ -11,8 +11,7 @@ function(input, output, session) {
   #on ne garde que les variables qui présentent un intérêt
   #et on évite les redondances
   
-  data_trie <- data[,c(2,4, 7, 9, 11, 15, 17, 18, 19, 20, 21, 
-                       22, 23, 24, 25, 26, 27, 28, 29, 30)]
+  dta_trie <- data[,c(1,4,7,9,11,17,18,24,30)]
   
   #on retire les tirets car R les voit comme des signes moins
   
@@ -27,9 +26,12 @@ function(input, output, session) {
 
   observeEvent(input$Go, {
     # a1 <- reactive({input$an[1]})
+    # A1 <- as.numeric(a1)
     # a2 <- reactive({input$an[2]})
-    # for (a in a1:a2){
-    #   print(a)
+    # A2 <- as.numeric(a2)
+    # res.aov <- c()
+    # for (a in A1:A2){
+    #   
     #   dta_a <- dta_trie[year==a]
     #   mod <- glm(input$Y ~ input$geo + input$sujet + femmes +
     #                input$geo:input$sujet +
@@ -38,19 +40,31 @@ function(input, output, session) {
     #   res.aov <- c(res.aov, 
     #                summary(Anova(mod, type = "III")))
     
-    a <- as.character(reactive({input$an[1]}))
-    geog <- reactive({input$geo})
-    sujet <- as.character(reactive({input$sujet}))
-    Y <- as.character(reactive({input$Y}))
-
-    print(a)
-    mod <- glm(Y ~ geo + sujet + femmes +
-                  geo:sujet +
-                  geo:femmes+
-                  sujet:femmes, data = dta_trie)
+    A <- reactive({input$an[1]})
+    a <- as.numeric(A())
+    
+    dta_trie <- dta_trie[annee == a]
+    
+    Geo <- (reactive({input$geo}))
+    g <- as.numeric(Geo())
+    G <- dta_trie[,..g][[1]]
+    
+    Suj <- reactive({input$sujet})
+    s <- as.numeric(Suj())
+    S <- dta_trie[,..s][[1]]
+    
+    YA <- reactive({input$Y})
+    y <- as.numeric(YA())
+    Y <- dta_trie[,..y][[1]]
+    
+    F <- dta_trie$femmes
+    
+    mod <- lm(Y~G + S + F +
+                 G:S + G:F + S:F +
+                 G:S:F)
     res.aov <- summary(Anova(mod, type = "III"))
     
-    
+
     output$aov <- renderPrint({res.aov})
     
   })
