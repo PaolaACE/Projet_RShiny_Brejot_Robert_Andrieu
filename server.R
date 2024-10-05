@@ -61,12 +61,13 @@ function(input, output, session) {
     
     F <- dta_trie$femmes
     
-    mod <- lm(Y~G + S +
-                 G:S )
+    mod <- lm(Y~G + S + F+
+                 G:S + G:F + S:F +
+                G:S:F)
     res.aov <- summary(Anova(mod, type = "III"))
     
 
-    output$aov <- renderPrint({summary(F)})
+    output$aov <- renderPrint({res.aov})
     
   })
 
