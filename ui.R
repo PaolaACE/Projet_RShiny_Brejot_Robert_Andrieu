@@ -40,9 +40,7 @@ fluidPage(
             choiceNames = list("Salaire brut annuel estimé", 
                                "Taux d'emploi", 
                                "Taux d'insertion"),
-            choiceValues = list("salaire_brut_annuel_estime",
-                                "taux_d_emploi", 
-                                "taux_dinsertion"), 
+            choiceValues = list(8, 7, 6), 
             selected = 1
           ),
           
@@ -50,7 +48,7 @@ fluidPage(
             inputId = "geo",
             label = "Niveau geographique",
             choiceNames = list("Académie", "Etablissement"),
-            choiceValues = list("academie", "etablissement"), 
+            choiceValues = list(3, 2), 
             selected = 1
           ),
           
@@ -58,7 +56,7 @@ fluidPage(
             inputId = "sujet",
             label = "Niveau de précision du sujet",
             choiceNames = list("Domaine (5)", "Discipline(20)"),
-            choiceValues = list("domaine", "discipline"), 
+            choiceValues = list(4,5), 
             selected = 1
           ), 
           

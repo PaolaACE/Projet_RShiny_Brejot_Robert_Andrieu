@@ -26,6 +26,8 @@ function(input, output, session) {
   dta_trie <- dta_trie[etablissement != "Toutes universités et établissements assimilés"]
 
   observeEvent(input$Go, {
+    
+    #code qui devrait devenir le final ----
     # a1 <- reactive({input$an[1]})
     # A1 <- as.numeric(a1)
     # a2 <- reactive({input$an[2]})
@@ -34,17 +36,41 @@ function(input, output, session) {
     # for (a in A1:A2){
     #   
     #   dta_a <- dta_trie[year==a]
-    #   mod <- glm(input$Y ~ input$geo + input$sujet + femmes +
-    #                input$geo:input$sujet +
-    #                input$geo:femmes+
-    #                input$sujet:femmes, data = dta_a)
+    
+    #   Geo <- (reactive({input$geo}))
+    #   g <- as.numeric(Geo())
+    #   G <- dta_a[,..g][[1]]
+    # 
+    #   Suj <- reactive({input$sujet})
+    #   s <- as.numeric(Suj())
+    #   S <- dta_a[,..s]
+    # 
+    #   YA <- reactive({input$Y})
+    #   y <- as.numeric(YA())
+    #   Y <- dta_a[,..y][[1]]
+    #   Y <- as.numeric(Y)
+    # 
+    #   F <- dta_a$femmes
+    #   F <- as.numeric(F)
+    # 
+    #   on etablit alors le modele
+    
+    #   mod <- lm(Y~G + S + F+
+    #              G:S + G:F + S:F +
+    #             G:S:F)
+    #   res.aov <- summary(Anova(mod, type = "III"))
     #   res.aov <- c(res.aov, 
     #                summary(Anova(mod, type = "III")))
+    
+    #test seulement sur une annee ----
     
     A <- reactive({input$an[1]})
     a <- as.numeric(A())
     
     dta_trie <- dta_trie[annee == a]
+    
+    #On selectionne les vecteurs sur lesquels on fera l'analyse
+    #a partir des parametres rentres par l'utilisateur
     
     Geo <- (reactive({input$geo}))
     g <- as.numeric(Geo())
@@ -52,22 +78,28 @@ function(input, output, session) {
     
     Suj <- reactive({input$sujet})
     s <- as.numeric(Suj())
-    S <- dta_trie[,..s][[1]]
+    S <- dta_trie[,..s]
     
     YA <- reactive({input$Y})
     y <- as.numeric(YA())
     Y <- dta_trie[,..y][[1]]
-    Y <- as.numeric(Y)
+    Y2 <- as.numeric(Y)
     
     F <- dta_trie$femmes
+    F <- as.numeric(F)
     
-    mod <- lm(Y~G + S + F+
-                 G:S + G:F + S:F +
-                G:S:F)
-    res.aov <- summary(Anova(mod, type = "III"))
+    #on etablit alors le modele
+    
+    # mod <- lm(Y~G + S + F+
+    #              G:S + G:F + S:F +
+    #             G:S:F)
+    # res.aov <- summary(Anova(mod, type = "III"))
     
 
-    output$aov <- renderPrint({res.aov})
+    output$aov <- renderPrint({summary(Y2)})
+    #ne marche pas ici car la conversion en numeric reduit les valeurs d'une 
+    #facon que je ne comprends pas (les salaires ne vont que jusqu'a 230
+    #et le taux d'emploi est constant à 1)
     
   })
 
