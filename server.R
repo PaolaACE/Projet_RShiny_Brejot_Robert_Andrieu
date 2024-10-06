@@ -93,28 +93,27 @@ function(input, output, session) {
     
     Suj <- reactive({input$sujet})
     s <- as.numeric(Suj())
-    S <- dta_trie[,..s]
+    S <- dta_trie[,..s][[1]]
     
     YA <- reactive({input$Y})
     y <- as.numeric(YA())
-    Y <- dta_trie[,..y][[1]]
-    Y2 <- as.numeric(Y)
+    Y2 <- dta_trie[,..y][[1]]
+    Y2 <- as.character(Y2)
+    Y <- sapply(Y2, as.numeric)
     
     F <- dta_trie$femmes
     F <- as.numeric(F)
     
     #on etablit alors le modele (ne marche pas avec 2010 car les femmes sont que
     #des NA)
-    # mod <- lm(Y~G + S + F+
-    #              G:S + G:F + S:F +
-    #             G:S:F)
-    # res.aov <- summary(Anova(mod, type = "III"))
+    mod <- lm(Y~G + S + F+
+                 G:S + G:F + S:F +
+                G:S:F)
+    res.aov <- anova(mod)
     
 
-    output$aov <- renderPrint({summary(Y2)})
-    #ne marche pas ici car la conversion en numeric reduit les valeurs d'une 
-    #facon que je ne comprends pas (les salaires ne vont que jusqu'a 230
-    #et le taux d'emploi est constant à 1)
+    output$aov <- renderPrint({res.aov})
+
     
   })
 
