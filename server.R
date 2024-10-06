@@ -26,19 +26,18 @@ function(input, output, session) {
   dta_trie <- dta_trie[etablissement != "Toutes universités et établissements assimilés"]
 
   observeEvent(input$Go, {
-    
-    #code qui devrait devenir le final ----
     a1 <- reactive({input$an[1]})
     A1 <- as.numeric(a1())
     a2 <- reactive({input$an[2]})
     A2 <- as.numeric(a2())
     
-    #on stockera les resultats dans res.aov
+    #on stockera les resultats des anova dans res.aov
     
     res.aov <- c()
     
     for (a in A1:A2){
-        # on considère les donnees annee par annee
+        # on considère les donnees annee par annee entre les deux annees 
+      #selectionnees
 
        dta_a <- dta_trie[annee==a]
       
@@ -73,52 +72,15 @@ function(input, output, session) {
       else{
          #si le taux de femmes a ete mesure, alors on le fait rentrer dans le
          #modele
-
          mod <- glm(Y~G + S + Fe+
                      G:S + G:Fe + S:Fe +
                      G:S:Fe)
-         
       }
     
       res.aov <- c(res.aov, a,
                    anova(mod))
       }
     
-    #test seulement sur une annee MARCHE ----
-    # 
-    # A <- reactive({input$an[1]})
-    # a <- as.numeric(A())
-    # 
-    # dta_trie <- dta_trie[annee == a]
-    # 
-    #On selectionne les vecteurs sur lesquels on fera l'analyse
-    #a partir des parametres rentres par l'utilisateur
-    # 
-    # Geo <- (reactive({input$geo}))
-    # g <- as.numeric(Geo())
-    # G <- dta_trie[,..g][[1]]
-    # 
-    # Suj <- reactive({input$sujet})
-    # s <- as.numeric(Suj())
-    # S <- dta_trie[,..s][[1]]
-    # 
-    # YA <- reactive({input$Y})
-    # y <- as.numeric(YA())
-    # Y2 <- dta_trie[,..y][[1]]
-    # Y2 <- as.character(Y2)
-    # Y <- sapply(Y2, as.numeric)
-    # 
-    # F <- dta_trie$femmes
-    # F <- as.numeric(F)
-    # 
-    # #on etablit alors le modele (ne marche pas avec 2010 car les femmes sont que
-    # #des NA)
-    # mod <- glm(Y~G + S + F+
-    #              G:S + G:F + S:F +
-    #             G:S:F)
-    # res.aov <- anova(mod)
-    
-
     output$aov <- renderPrint({res.aov})
 
     
