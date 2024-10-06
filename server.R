@@ -52,13 +52,28 @@ function(input, output, session) {
     # 
     #   F <- dta_a$femmes
     #   F <- as.numeric(F)
+    
+    #   F0 <- rep("ns", length(F))
     # 
     #   on etablit alors le modele
+    #   if (F==F0){
+    #      si F est egal a F0, alors le taux de femmes n'a pas ete mesure
+    #      le modele est donc construit sans cette variable 
     
-    #   mod <- lm(Y~G + S + F+
-    #              G:S + G:F + S:F +
-    #             G:S:F)
+    #      mod <- lm(Y~G + S +
+    #              G:S)
     #   res.aov <- summary(Anova(mod, type = "III"))
+    #   }
+    #   else{
+    #      si le taux de femmes a ete mesure, alors on le fait rentrer dans le
+    #      modele
+    #
+    #      mod <- lm(Y~G + S + F+
+    #                  G:S + G:F + S:F +
+    #                  G:S:F)
+    #      res.aov <- summary(Anova(mod, type = "III"))
+    #   }
+    
     #   res.aov <- c(res.aov, 
     #                summary(Anova(mod, type = "III")))
     
@@ -88,8 +103,8 @@ function(input, output, session) {
     F <- dta_trie$femmes
     F <- as.numeric(F)
     
-    #on etablit alors le modele
-    
+    #on etablit alors le modele (ne marche pas avec 2010 car les femmes sont que
+    #des NA)
     # mod <- lm(Y~G + S + F+
     #              G:S + G:F + S:F +
     #             G:S:F)
@@ -104,3 +119,4 @@ function(input, output, session) {
   })
 
 }
+
