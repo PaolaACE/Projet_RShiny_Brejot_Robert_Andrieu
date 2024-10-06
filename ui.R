@@ -69,7 +69,7 @@ fluidPage(
         ), 
         sidebarPanel(
           title = "Analyses de la variance sur la période souhaitée",
-          width = 15,
+          width = 20,
           verbatimTextOutput(outputId = "aov")
         )
       )
