@@ -3,9 +3,12 @@
 library(data.table)
 library(shiny)
 library(car)
+library(FactomineR)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
+  
+  #analyse anova ----
   data <- fread(file = "fr-esr-insertion_professionnelle-master.csv", 
                 header = TRUE, sep = ";", stringsAsFactors = TRUE)
   
@@ -32,8 +35,28 @@ function(input, output, session) {
     A2 <- as.numeric(a2())
     
     #on stockera les resultats des anova dans res.aov
+    Geo <- (reactive({input$geo}))
+    g <- as.numeric(Geo())
+    G <- dta_trie[,..g][[1]]
+    noms_g <- levels(G)
     
-    res.aov <- c()
+    Suj <- reactive({input$sujet})
+    s <- as.numeric(Suj())
+    S <- dta_a[,..s][[1]]
+    noms_s <- levels(s)
+    
+    YA <- reactive({input$Y})
+    y <- as.numeric(YA())
+    Y2 <- dta_a[,..y][[1]]
+    Y2 <- as.character(Y2)
+    Y <- sapply(Y2, as.numeric)
+    
+    Fe <- dta_a$femmes
+    Fe <- as.numeric(Fe)
+    F0 <- rep(NA, length(Fe))
+    
+    coeffs_geo <- data.frame(lieu = noms_g)
+    coeffs_suj <- data.frame(sujet = noms_s)
     
     for (a in A1:A2){
         # on considère les donnees annee par annee entre les deux annees 
@@ -76,16 +99,51 @@ function(input, output, session) {
                      G:S + G:Fe + S:Fe +
                      G:S:Fe)
       }
+      Coefs_Geo <- coefficients(mod)[1]
     
       res.aov <- c(res.aov, a,
-                   anova(mod))
+                   coef(mod))
       }
     
     output$aov <- renderPrint({res.aov})
-
     
   })
+  
+  #analyse AFC ----
+  
+  observeEvent(Hop, {
+    
+    
+    Geo_AFC <- (reactive({input$geo_AFC}))
+    geo_AFC <- as.numeric(Geo_AFC())
+    
+    Suj_AFC <- (reactive({input$suj_AFC}))
+    suj_AFC <- as.numeric(Suj_AFC())
+    
+    An_AFC <- (reactive({input$an_AFC}))
+    an_AFC <- as.numeric(an_AFC())
+    
+    I <- length(data_AFC[, ..geo_AFC])
+    J <- length(data_AFC[, ..suj_AFC])
+    
+    Conting <- matrix(data=NA, nrow = I, ncol = J)
+    
+    dta_AFC <- data[annee = an_AFC ,c(4,7,9,11,14)]
+    
+    for (i in levels(data[,..suj_AFC])){
+      for (j in levels(data[,..geo_AFC])){
+        dta_cherche <- sum(data[annee == a_AFC, ..suj_AFC = i, ..geo_AFC = j])
+        Conting[i, j] <- dta_cherche
+      }
+    }
+    
+    output$conting <- renderTable({Conting})
+    CFA(Conting)
+  
+  })
+  
 
   
 }
+
 

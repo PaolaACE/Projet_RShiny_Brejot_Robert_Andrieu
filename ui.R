@@ -74,6 +74,50 @@ fluidPage(
         )
       )
     ),
+    tabPanel(
+      title = "Analyse AFC",
+      sidebarLayout(
+        sidebarPanel(
+          title = "Paramètres",
+          width = 5,
+          
+          radioButtons(
+            inputId = "geo_AFC",
+            label = "Niveau geographique",
+            choiceNames = list("Académie", "Etablissement"),
+            choiceValues = list(3, 2), 
+            selected = 1
+          ),
+          
+          radioButtons(
+            inputId = "sujet_AFC",
+            label = "Niveau de précision du sujet",
+            choiceNames = list("Domaine (5)", "Discipline(20)"),
+            choiceValues = list(4,5), 
+            selected = 1
+          ), 
+          
+          sliderInput(
+            inputId = "an_AFC",
+            label = "En quelle année?",
+            value = 2015,
+            min = 2010, 
+            max = 2020, 
+            round = TRUE, 
+            step = 1
+          ), 
+          actionButton(
+            inputId = "Hop", 
+            label = "Lancer l'AFC"
+          )
+        ), 
+        sidebarPanel(
+          title = "Analyses Factorielle des Correspondances",
+          width = 20,
+          tableOutput(outputId = conting)
+        )
+      )
+    ),
       
     
     navbarMenu(
