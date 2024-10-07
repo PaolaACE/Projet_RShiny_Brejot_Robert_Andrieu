@@ -57,9 +57,10 @@ function(input, output, session) {
     Fe <- dta_trie$femmes
     Fe <- as.numeric(Fe)
     F0 <- rep(NA, length(Fe))
+    podium_vide <- rep(NA, times = 10)
+    podium_geo <- data.frame(position = c(1:10))
+    podium_suj <- data.frame(position = c(1:5))
     
-    coeffs_geo <- data.frame(lieu = noms_g)
-    coeffs_suj <- data.frame(sujet = noms_s)
     iter = 1
     
     res.em <- c()
@@ -95,22 +96,46 @@ function(input, output, session) {
          #si F n'a que des NA, alors le taux de femmes n'a pas ete mesure
          #le modele est donc construit sans cette variable
 
-         mod <- glm(Y~G + S +
+         mod <- lm(Y~G + S +
                  G:S)
       }
       else{
          #si le taux de femmes a ete mesure, alors on le fait rentrer dans le
          #modele
-         mod <- glm(Y~G + S + Fe+
-                     G:S + G:Fe + S:Fe +
-                     G:S:Fe)
+         mod <- lm(Y~G + S + Fe+
+                     G:S + G:Fe + S:Fe)
       }
-      # coeffs_geo[,iter+1] <- emmeans(mod, ~G)[,4]
-      # coeffs_suj[,iter+1] <- emmeans(mod, ~S)[,4]
-      em <- emmeans(mod, ~G)
+      
+      em_G <- emmeans(mod, ~G)
+      em_S <- emmeans(mod, ~S)
+      
+      em_G <- data.frame(em_G)
+      em_S <- data.frame(em_S)
+      
+      em_G <- data.table(em_G)
+      em_S <- data.table(em_S)
+      
+      em_G <- em_G[order(emmean), ]
+      em_S <- em_S[order(emmean), ]
+      
+      pod_G <- em_G[c(1:10),]
+      pod_S <- em_S[c(1:5),]
+      
+      pod_G <- data.frame(pod_G)
+      pod_S <- data.frame(pod_S)
+      
+      pod_G <- pod_G[,1]
+      pod_S <- pod_S[,1]
+      
+      podium_geo <- cbind(podium_geo, pod_G)
+      podium_suj <- cbind(podium_suj, pod_S)
       }
     
-    output$res <- renderPrint({em})
+    colnames(podium_geo)[-1]<- seq(from=A1, to = A2, by = 1)
+    colnames(podium_suj)[-1]<- seq(from=A1, to = A2, by = 1)
+    
+    output$res_geo <- renderTable({podium_geo})
+    output$res_suj <- renderTable({podium_suj})
     
   })
   

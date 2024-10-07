@@ -34,15 +34,15 @@ fluidPage(
                                "Taux d'emploi", 
                                "Taux d'insertion"),
             choiceValues = list(8, 7, 6), 
-            selected = 1
+            selected = 8
           ),
           
           radioButtons(
             inputId = "geo",
             label = "Niveau geographique",
             choiceNames = list("Académie", "Etablissement"),
-            choiceValues = list(3, 2), 
-            selected = 1
+            choiceValues = list(3, 2),
+            selected = 3
           ),
           
           radioButtons(
@@ -50,13 +50,13 @@ fluidPage(
             label = "Niveau de précision du sujet",
             choiceNames = list("Domaine (5)", "Discipline(20)"),
             choiceValues = list(4,5), 
-            selected = 1
+            selected = 4
           ), 
           
           sliderInput(
             inputId = "an",
             label = "Sur quelle période? ",
-            value = c(2010, 2020),
+            value = c(2014, 2015),
             min = 2010, 
             max = 2020, 
             round = TRUE, 
@@ -68,9 +68,10 @@ fluidPage(
           )
         ), 
         sidebarPanel(
-          title = "Analyses de la variance sur la période souhaitée",
+          title = "Analyses sur la période souhaitée",
           width = 20,
-          verbatimTextOutput(outputId = "res")
+          tableOutput(outputId = "res_suj"), 
+          tableOutput(outputId = "res_geo")
         )
       )
     ),
