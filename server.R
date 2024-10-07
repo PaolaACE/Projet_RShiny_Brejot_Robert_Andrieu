@@ -54,9 +54,10 @@ function(input, output, session) {
     Y2 <- as.character(Y2)
     Y <- sapply(Y2, as.numeric)
     
-    Fe <- dta_trie$femmes
-    Fe <- as.numeric(Fe)
-    F0 <- rep(NA, length(Fe))
+    #Fe <- dta_trie$femmes
+    #Fe <- as.numeric(Fe)
+    #F0 <- rep(NA, length(Fe))
+    
     podium_vide <- rep(NA, times = 10)
     podium_geo <- data.frame(position = c(1:10))
     podium_suj <- data.frame(position = c(1:5))
@@ -66,8 +67,9 @@ function(input, output, session) {
     res.em <- c()
     
     for (a in A1:A2){
-        # on considère les donnees annee par annee entre les deux annees 
-      #selectionnees
+      
+      # on ne considere qu'une annee
+      
       iter <- iter+1
       dta_a <- dta_trie[annee==a,]
       
@@ -86,25 +88,13 @@ function(input, output, session) {
       Y2 <- dta_a[,..y][[1]]
       Y2 <- as.character(Y2)
       Y <- sapply(Y2, as.numeric)
+      
+      #on etablit le modele a l'aide de la fonction lm
 
-      Fe <- dta_a$femmes
-      Fe <- as.numeric(Fe)
-      F0 <- rep(NA, length(Fe))
-
-      #on etablit alors le modele
-      if (identical(Fe,F0)){
-         #si F n'a que des NA, alors le taux de femmes n'a pas ete mesure
-         #le modele est donc construit sans cette variable
-
-         mod <- lm(Y~G + S +
-                 G:S)
-      }
-      else{
-         #si le taux de femmes a ete mesure, alors on le fait rentrer dans le
-         #modele
-         mod <- lm(Y~G + S + Fe+
-                     G:S + G:Fe + S:Fe)
-      }
+      mod <- lm(Y~G + S + G:S)
+      
+      #on cherche alors a selectionner les "classements" des meilleurs en 
+      #terme de geographie et de sujet d'études pour la variable sélectionnee
       
       em_G <- emmeans(mod, ~G)
       em_S <- emmeans(mod, ~S)
@@ -129,10 +119,14 @@ function(input, output, session) {
       
       podium_geo <- cbind(podium_geo, pod_G)
       podium_suj <- cbind(podium_suj, pod_S)
-      }
+    }
+    
+    #on renomme les colonnes pour la lisibilité
     
     colnames(podium_geo)[-1]<- seq(from=A1, to = A2, by = 1)
     colnames(podium_suj)[-1]<- seq(from=A1, to = A2, by = 1)
+    
+    #on stocke ces classements dans des outputs
     
     output$res_geo <- renderTable({podium_geo})
     output$res_suj <- renderTable({podium_suj})
@@ -143,7 +137,7 @@ function(input, output, session) {
 
   observeEvent(input$Hop, {
 
-    #on recupere les valeurs des index
+    #on recupere les valeurs des index des parametres rentres par l'utilisateur
 
     Geo_AFC <- (reactive({input$geo_AFC}))
     geo_AFC <- as.numeric(Geo_AFC())
@@ -154,19 +148,31 @@ function(input, output, session) {
     An_AFC <- (reactive({input$an_AFC}))
     an_AFC <- as.numeric(An_AFC())
     
+    #on ne garde ici que les variables d'interet: 
+    #domaine et discipline pour le sujet
+    #academie et etablissement pour le niveau geographique
+    #et le nombre de reponses comme indicateur de la population
+    
     data_AFC <- data[annee == an_AFC, c(4,7,9,11,14)]
     
+    #on cree alors des variables portant des noms connus pour pouvoir les 
+    #manipuler (conditionner dessus)
+    
     geo <- data_AFC[,..geo_AFC][[1]]
-    data_AFC[, geographie:= geo]
+    data_AFC[, geographie := geo]
     
     suj <- data_AFC[,..suj_AFC][[1]]
     data_AFC[, sujet := suj]
+    
+    #on stocke les modalites des variables pour pouvoir iterer dessus
     
     modalites_suj <- levels(data_AFC[,sujet])
     modalites_geo <- levels(data_AFC[,geographie])
     
     I <- length(modalites_geo)
     J <- length(modalites_suj)
+    
+    #on cree une matrice de contingence vide que l'on remplira
      
     Conting <- matrix(data=NA, nrow = J, ncol = I)
 
@@ -176,20 +182,22 @@ function(input, output, session) {
         mod_i <- as.character(modalites_geo[i])
         mod_j <- as.character(modalites_suj[j])
         dta_eph <- data_AFC[(geographie==mod_i)&(sujet==mod_j), nombre_de_reponses]
+        #on somme, pour les observations qui possedent ces modalites, le nombre
+        #de reponses
         donnee <- sum(dta_eph)
         Conting[j, i] <- donnee
       }
     }
 
     tab_conting <- data.frame(Conting)
+    
     rownames(tab_conting) <- as.character(modalites_suj)
     colnames(tab_conting) <- as.character(modalites_geo)
+    
     output$Conting <- renderTable({tab_conting})
     
     AFC <- CA(tab_conting)
-    
     plot_AFC <-plot(AFC)
-    
     output$plot_AFC <- renderPlot({plot_AFC})
     
     })
