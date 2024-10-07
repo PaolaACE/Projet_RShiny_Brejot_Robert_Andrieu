@@ -8,6 +8,7 @@ library(tidygeocoder)
 library(factoextra)
 library(FactoMineR)
 library(emmeans)
+library(plotly)
 
 source("Import_donnees.R")
 
@@ -151,7 +152,7 @@ dashboardPage(
               numériques par domaines. Sélectionnez une variable en ordonnée pour visualiser son 
               boxplot et observer sa distribution."),
                     selectInput("varnum", "Sélectionnez la variable en ordonnée :", choices = colnames(data)[sapply(data, is.numeric)], selected = "annee")),
-                box(width = 9, plotOutput("boxplot"))
+                box(width = 9, plotlyOutput("boxplot"))
               )
       ),
       
@@ -184,7 +185,7 @@ dashboardPage(
                                 choices = unique(data$academie), 
                                 selected = "Rennes", multiple = TRUE)),
                 box(width = 5, selectInput("variable", "Choisir la variable :", choices = list("salaire_brut_annuel_estime", "taux_dinsertion", "taux_de_reponse"), selected = "salaire_brut_annuel_estime")),
-                box(width = 12, plotOutput("evolutionPlot")),
+                box(width = 12, plotlyOutput("evolutionPlot")),
               )
       ),
       # Onglet Carte

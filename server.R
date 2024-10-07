@@ -12,14 +12,19 @@ function(input, output, session) {
   })
   
   # Boxplot des données quantitatives par domaine ----
-  output$boxplot <- renderPlot({
-    ggplot(data, aes(x = domaine, y = get(input$varnum))) +
+  output$boxplot <- renderPlotly({
+    # Créez le boxplot avec ggplot2
+    p <- ggplot(data, aes(x = domaine, y = get(input$varnum))) +
       geom_boxplot() +
       labs(
         title = paste("Répartition de", input$varnum, "par domaine"),
-        x = "Domaine", y = input$varnum
+        x = "Domaine", 
+        y = input$varnum
       ) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    
+    # Convertissez le ggplot en graphique interactif avec plotly
+    ggplotly(p)
   })
   
   # Salaire brut annuel moyen estimé par académie ----
@@ -63,8 +68,29 @@ function(input, output, session) {
       )
   })
   
+  # Répartition des réponses par variable qualitative ----
+  output$rep_salaires <- renderPlot({
+    selected_column <- as.character(input$varfac)
+    # Création du graphique à barres pour la variable catégorielle
+    ggplot(data, aes_string(x = selected_column), weight = "nombre_de_reponses") +
+      geom_bar(fill = "#0073B2", color = "white") +
+      labs(
+        title = paste("Nombre de réponses pour ", selected_column),
+        x = selected_column, 
+        y = "Fréquence"
+      ) +
+      geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, color = "black") + 
+      theme_minimal() +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+        axis.title.x = element_text(size = 14, face = "bold"),
+        axis.title.y = element_text(size = 14, face = "bold")
+      )
+  })
+  
   # Graphique d'évolution temporelle ----
-  output$evolutionPlot <- renderPlot({
+  output$evolutionPlot <- renderPlotly({
     data2 <- if (input$variable == "salaire_brut_annuel_estime") {
       data[!is.na(salaire_brut_annuel_estime)] %>%
         group_by(annee, academie) %>%
@@ -91,7 +117,7 @@ function(input, output, session) {
       "Taux de réponse (%)"
     }
     
-    ggplot(filtered_data, aes(x = annee, y = value, color = academie)) +
+    p <- ggplot(filtered_data, aes(x = annee, y = value, color = academie)) +
       geom_line(size = 1) +
       geom_point(size = 2) +
       labs(y = titre,
@@ -107,6 +133,7 @@ function(input, output, session) {
           seq(round(min(filtered_data$value)), 100, by = 1)
         }
       )
+    ggplotly(p)
   })
   
   # Analyse Factorielle des correspondances entre Localisation et Domaine ----
