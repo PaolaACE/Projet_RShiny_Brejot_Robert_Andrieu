@@ -29,7 +29,7 @@ fluidPage(
                   multiple = T),
       
       selectInput("variable", "Choisir la variable : ",
-                choices = list("salaire_brut_annuel_estime", "taux_de_reponse"),
+                choices = list("salaire_brut_annuel_estime", "taux_dinsertion"),
                 selected = "salaire_brut_annuel_estime"),
       
       plotOutput("evolutionPlot")

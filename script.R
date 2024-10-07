@@ -11,7 +11,7 @@ data$taux_dinsertion <- as.numeric(data$taux_dinsertion)
 data$taux_dinsertion[data$taux_dinsertion == "nd" | data$taux_dinsertion == "ns"] <- NA
 data$salaire_brut_annuel_estime[data$salaire_brut_annuel_estime == "nd" | data$salaire_brut_annuel_estime == "ns" | 
                                   data$salaire_brut_annuel_estime == "" | data$salaire_brut_annuel_estime == "."] <- NA
-data$salaire_brut_annuel_estime <- as.numeric(data$salaire_brut_annuel_estime)
+data$salaire_brut_annuel_estime <- as.numeric(as.character(data$salaire_brut_annuel_estime))
 
 summary(data$salaire_brut_annuel_estime)
 
@@ -25,6 +25,9 @@ df <- df %>%
   geocode(academie, method = 'osm', full_results = TRUE)
 
 df <- df[,1:5]
+
+write.csv(df, "coord_academies.csv", row.names = FALSE)
+
 
 library(leaflet)
 
@@ -49,7 +52,10 @@ data2 <- data2 %>% group_by(annee, academie) %>% summarise(salaire_brut_annuel_e
 
 filtere_data <- data2 %>% filter(academie %in% list("Rennes", "Lyon"))
 
-ggplot(filtere_data, aes(x=annee, y=salaire_brut_annuel_estime, color=academie)) +
+data2 <- data[!is.na(taux_dinsertion)]
+data2 <- data2 %>% group_by(annee, academie) %>% summarise(taux_d_insertion = mean(taux_dinsertion))
+
+ggplot(filtere_data, aes(x=annee, y=taux_d_insertion, color=academie)) +
   geom_line(size=1) +
   geom_point(size = 2) +
   labs(y = "Salaire (€)",
