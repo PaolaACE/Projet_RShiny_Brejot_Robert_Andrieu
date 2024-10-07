@@ -237,6 +237,71 @@ function(input, output, session) {
     
   })
   
+  observeEvent(input$Go, {
+    
+    # Période sélectionnée par l'utilisateur
+    A1 <- as.numeric(input$an[1])
+    A2 <- as.numeric(input$an[2])
+    
+    podium_geo <- data.frame(position = c(1:10))
+    podium_suj <- data.frame(position = c(1:5))
+    
+    for (a in A1:A2) {
+      # Filtrer les données par année
+      dta_a <- dta_trie[annee == a, ]
+      
+      # Variables géographique et sujet
+      g <- as.numeric(input$geo)
+      s <- as.numeric(input$sujet)
+      G <- dta_a[, ..g][[1]]
+      S <- dta_a[, ..s][[1]]
+      
+      # Variable dépendante (Y)
+      y <- as.numeric(input$Y)
+      Y2 <- dta_a[, ..y][[1]]
+      Y <- as.numeric(as.character(Y2))
+      
+      # Modèle linéaire
+      mod <- lm(Y ~ G + S + G:S)
+      
+      # Effectuer les comparaisons (emmeans)
+      em_G <- emmeans(mod, ~G)
+      em_S <- emmeans(mod, ~S)
+      
+      # Conversion en data.frame
+      em_G_df <- as.data.frame(em_G)
+      em_S_df <- as.data.frame(em_S)
+      
+      # Organiser les résultats par géographie et sujet
+      em_G <- data.table(em_G_df)[order(emmean), ]
+      em_S <- data.table(em_S_df)[order(emmean), ]
+      
+      podium_geo <- cbind(podium_geo, em_G[1:10, 1])
+      podium_suj <- cbind(podium_suj, em_S[1:5, 1])
+    }
+    
+    colnames(podium_geo)[-1] <- seq(A1, A2)
+    colnames(podium_suj)[-1] <- seq(A1, A2)
+    
+    # Afficher les résultats dans les tableaux
+    output$res_geo <- DT::renderDataTable({
+      DT::datatable(
+        podium_geo,
+        options = list(
+          scrollX = TRUE
+        )
+      )
+    })
+    output$res_suj <- DT::renderDataTable({
+      DT::datatable(
+        podium_suj,
+        options = list(
+          scrollX = TRUE
+        )
+      )
+    })
+  })
+  
   
 }
 

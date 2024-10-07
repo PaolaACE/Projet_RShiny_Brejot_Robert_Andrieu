@@ -28,6 +28,25 @@ data[, (33:35) := lapply(.SD, as.factor), .SDcols = (33:35)]
 # write.csv(df, "coord_academies.csv", row.names = FALSE)
 
 df <- read.csv("coord_academies.csv")
+
+
+### Pour l'anova
+# Charger les données
+dat <- fread(file = "fr-esr-insertion_professionnelle-master.csv", 
+             header = TRUE, sep = ";", stringsAsFactors = TRUE)
+
+# Filtrer les données pour ne conserver que les variables pertinentes
+dta_trie <- dat[,c(1, 4, 7, 9, 11, 17, 18, 24, 30)]
+
+# Remplacer les tirets dans certaines valeurs de la colonne 'académie'
+dta_trie[academie == "Aix-Marseille", academie := "Aix_Marseille"]
+dta_trie[academie == "Clermont-Ferrand", academie := "Clermont_Ferrand"]
+dta_trie[academie == "Nancy-Metz", academie := "Nancy_Metz"]
+dta_trie[academie == "Orléans-Tours", academie := "Orleans_Tours"]
+
+# Retirer les lignes résumées
+dta_trie <- dta_trie[etablissement != "Toutes universités et établissements assimilés"]
+
 ####################  Liste des variables  ###########################
 #annee
 #diplome
