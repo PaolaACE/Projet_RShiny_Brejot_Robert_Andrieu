@@ -62,23 +62,44 @@ function(input, output, session) {
       data[!is.na(salaire_brut_annuel_estime)] %>%
         group_by(annee, academie) %>%
         summarise(value = mean(salaire_brut_annuel_estime))
-    } else {
+    } 
+    else if (input$variable == "taux_dinsertion") {
       data[!is.na(taux_dinsertion)] %>%
         group_by(annee, academie) %>%
         summarise(value = mean(taux_dinsertion))
     }
+    else if (input$variable == "taux_de_reponse"){
+      data[!is.na(taux_de_reponse)] %>%
+        group_by(annee, academie) %>%
+        summarise(value = mean(taux_de_reponse))
+    }
     
     filtered_data <- data2 %>% filter(academie %in% input$academie)
     
+    titre <- if(input$variable == "salaire_brut_annuel_estime"){
+      "Salaire (€)"
+    } else if (input$variable == "taux_dinsertion"){
+      "Taux d'insertion (%)"
+    } else if (input$variable == "taux_de_reponse"){
+      "Taux de réponse (%)"
+    }
+      
     ggplot(filtered_data, aes(x = annee, y = value, color = academie)) +
       geom_line(size = 1) +
       geom_point(size = 2) +
-      labs(y = ifelse(input$variable == "salaire_brut_annuel_estime", "Salaire (€)", "Taux d'insertion (%)"),
+      labs(y = titre,
            x = "Année",
            color = "Académie") +
       theme_minimal() +
-      theme(legend.position = "bottom")
-    
+      theme(legend.position = "bottom") +
+      scale_x_continuous(breaks = seq(min(filtered_data$annee), max(filtered_data$annee), by = 1))+
+      scale_y_continuous(
+        breaks = if (input$variable == "salaire_brut_annuel_estime") {
+          seq(0, max(filtered_data$value, na.rm = TRUE), by = 1000)
+        } else {
+          seq(round(min(filtered_data$value)), 100, by = 1)
+        }
+      )
   })
 }
 
