@@ -130,30 +130,44 @@ function(input, output, session) {
     an_AFC <- as.numeric(An_AFC())
     
     data_AFC <- data[annee == an_AFC, c(4,7,9,11,14)]
-
-    I <- length(levels(data_AFC[, ..geo_AFC][[1]]))
-    J <- length(levels(data_AFC[, ..suj_AFC][[1]]))
-
-    Conting <- matrix(data=NA, nrow = I, ncol = J)
+    
+    geo <- data_AFC[,..geo_AFC][[1]]
+    data_AFC[, geographie:= geo]
+    
+    suj <- data_AFC[,..suj_AFC][[1]]
+    data_AFC[, sujet := suj]
+    
+    modalites_suj <- levels(data_AFC[,sujet])
+    modalites_geo <- levels(data_AFC[,geographie])
+    
+    I <- length(modalites_geo)
+    J <- length(modalites_suj)
+     
+    Conting <- matrix(data=NA, nrow = J, ncol = I)
 
     for (i in 1:I){
       for (j in 1:J){
         #on stocke les modalites associees en terme de sujet et de geographie
-        mod_i <- levels(data_AFC[,..geo_AFC][[1]])[i]
-        mod_j <- levels(data_AFC[,..suj_AFC][[1]])[j]
-        dta_eph <- data_AFC[..suj_AFC == mod_i&..geo_AFC == j]
-        donnee <- sum(dta_eph[,nombre_de_reponses])
-        Conting[i, j] <- donnee
+        mod_i <- as.character(modalites_geo[i])
+        mod_j <- as.character(modalites_suj[j])
+        dta_eph <- data_AFC[(geographie==mod_i)&(sujet==mod_j), nombre_de_reponses]
+        donnee <- sum(dta_eph)
+        Conting[j, i] <- donnee
       }
     }
 
     tab_conting <- data.frame(Conting)
-    colnames(tab_conting) <- levels(data_AFC[, ..geo_AFC])
-    rownames(tab_conting) <- levels(data_AFC[, ..suj_AFC])
-    output$Conting <- renderTable({Conting})
-    #CFA(tab_conting)
+    rownames(tab_conting) <- as.character(modalites_suj)
+    colnames(tab_conting) <- as.character(modalites_geo)
+    output$Conting <- renderTable({tab_conting})
+    
+    AFC <- CA(tab_conting)
+    
+    plot_AFC <-plot(AFC)
+    
+    output$plot_AFC <- renderPlot({plot_AFC})
+    
     })
   
 }
-
 
