@@ -67,7 +67,7 @@ dashboardPage(
       tabItem(tabName = "evolution",
               fluidRow(
                 box(width = 3, selectInput("academie", "Choisir les académies :", choices = unique(data$academie), selected = "Rennes", multiple = TRUE)),
-                box(width = 5, selectInput("variable", "Choisir la variable :", choices = list("salaire_brut_annuel_estime", "taux_d_insertion"), selected = "salaire_brut_annuel_estime")),
+                box(width = 5, selectInput("variable", "Choisir la variable :", choices = list("salaire_brut_annuel_estime", "taux_dinsertion", "taux_de_reponse"), selected = "salaire_brut_annuel_estime")),
                 box(width = 12, plotOutput("evolutionPlot")),
               )
       ),
