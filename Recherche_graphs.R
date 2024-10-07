@@ -63,3 +63,13 @@ ggplot(data, aes(x = discipline)) +
   labs(title = "Répartition des emplois stables et cadres/professions intermédiaires", 
        x = "Discipline", y = "Taux (%)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
+
+
+library(FactoMineR)
+library(Factoshiny)
+Factoshiny(as.data.frame(table(data$academie,data$domaine)))

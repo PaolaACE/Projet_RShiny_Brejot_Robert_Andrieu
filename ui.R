@@ -70,7 +70,7 @@ dashboardPage(
             width = 3,
             selectInput(
               inputId = "varfac", label = "Sélectionnez la variable en abscisse :",
-              choices = colnames(data)[sapply(data, is.factor)],
+              choices = colnames(data)[sapply(data, is.factor) & colnames(data) != "remarque"],
               selected = "domaine"
             )
           ),
@@ -84,7 +84,7 @@ dashboardPage(
           ),
           box(title = "Salaires par variables catégorielles" ,collapsible = TRUE, collapsed = TRUE,
               width = 12, plotOutput("salaire_ac")),
-          box(title = "Répartition des salaires", collapsible = TRUE, collapsed = TRUE,
+          box(title = "Répartition des réponses", collapsible = TRUE, collapsed = TRUE,
               width = 12, plotOutput("rep_salaires"))
         )
       )

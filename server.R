@@ -45,12 +45,11 @@ function(input, output, session) {
   })
   output$rep_salaires <- renderPlot({
     selected_column <- as.character(input$varfac)
-
     # Création du graphique à barres pour la variable catégorielle
-    ggplot(data, aes_string(x = selected_column)) +
+    ggplot(data, aes_string(x = selected_column), weight = "nombre_de_reponses") +
       geom_bar(fill = "#0073B2", color = "white") +
       labs(
-        title = paste("Distribution des salaires nets médians par", selected_column),
+        title = paste("Nombre de réponses pour ", selected_column),
         x = selected_column, 
         y = "Fréquence"
       ) +
