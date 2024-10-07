@@ -1,6 +1,6 @@
 ####Import des packages
 require(data.table)
-
+library(leaflet)
 ####Import des données
 
 data <- fread(file = "fr-esr-insertion_professionnelle-master.csv", 
@@ -13,14 +13,22 @@ data[, c(1,14:32) := lapply(.SD, as.numeric), .SDcols = c(1,14:32)]
 data[, (2:13) := lapply(.SD, as.factor), .SDcols = (2:13)]
 data[, (33:35) := lapply(.SD, as.factor), .SDcols = (33:35)]
 
-summary(data$taux_d_emploi)
-class(data$etablissement)
-class(data$id_paysage)
+### Préparation données carte ###
 
-summary(data$taux_d_emploi)
-dim(data)
+## Création du jeu de données des coordonnées des académies
 
-#### Liste des variables
+# df <- data %>% group_by(academie) %>%
+#   summarise(taux_reponse_totale = mean(taux_de_reponse, na.rm=TRUE), 
+#             taux_insertion_moyen = mean(taux_dinsertion, na.rm = TRUE))
+# df <- df[2:30,]
+# df$academie <- as.character(df$academie)
+# df <- df %>%
+#   geocode(academie, method = "osm", full_results = TRUE)
+# df <- df[,1:5]
+# write.csv(df, "coord_academies.csv", row.names = FALSE)
+
+df <- read.csv("coord_academies.csv")
+####################  Liste des variables  ###########################
 #annee
 #diplome
 #numero_de_l_etablissement
@@ -57,18 +65,5 @@ dim(data)
 #cle disc
 #id_paysage
 
-summary(data$salaire_net_mensuel_regional_1er_quartile)
-summary(data$annee)
-summary(data$taux_d_emploi)
-summary(data$diplome)
-summary(data$emplois_cadre_ou_professions_intermediaires)
-summary(data$situation)
-data$emplois_exterieurs_a_la_region_de_luniversite
-table(data$etablissementactuel, data$etablissement)
-summary(data$femmes)
-
-data[annee==2013 & etablissement == 'Angers', .N]
-data[]
-#axes d'analyses
 
 
