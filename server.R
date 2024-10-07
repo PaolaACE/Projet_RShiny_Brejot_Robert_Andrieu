@@ -3,7 +3,8 @@
 library(data.table)
 library(shiny)
 library(car)
-library(FactomineR)
+library(FactoMineR)
+library(Factoshiny)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
@@ -110,39 +111,45 @@ function(input, output, session) {
   })
   
   #analyse AFC ----
-  
-  observeEvent(Hop, {
-    
-    
+
+  observeEvent(input$Hop, {
+
+    #on recupere les valeurs
+
     Geo_AFC <- (reactive({input$geo_AFC}))
     geo_AFC <- as.numeric(Geo_AFC())
-    
+
     Suj_AFC <- (reactive({input$suj_AFC}))
     suj_AFC <- as.numeric(Suj_AFC())
-    
+
     An_AFC <- (reactive({input$an_AFC}))
-    an_AFC <- as.numeric(an_AFC())
+    an_AFC <- as.numeric(An_AFC())
     
+    data_AFC <- data[annee = an_AFC ,c(4,7,9,11,14)]
+
     I <- length(data_AFC[, ..geo_AFC])
     J <- length(data_AFC[, ..suj_AFC])
-    
+
     Conting <- matrix(data=NA, nrow = I, ncol = J)
-    
-    dta_AFC <- data[annee = an_AFC ,c(4,7,9,11,14)]
-    
-    for (i in levels(data[,..suj_AFC])){
+
+
+
+    for (i in 1:I){
       for (j in levels(data[,..geo_AFC])){
-        dta_cherche <- sum(data[annee == a_AFC, ..suj_AFC = i, ..geo_AFC = j])
+        #on stocke les modalites associees en terme de sujet et de geographie
+        mod_i = levels(data[,..suj_AFC])
+        mod_j = levels(data[,..geo_AFC])
+        dta_cherche <- sum(data[annee == a_AFC&..suj_AFC == mod_i&..geo_AFC == j])
         Conting[i, j] <- dta_cherche
       }
     }
-    
-    output$conting <- renderTable({Conting})
-    CFA(Conting)
-  
-  })
-  
 
+    output$Conting <- renderTable({Conting})
+    tab_conting <- data.frame(Conting)
+    colnames(tab_conting)<- levels(data_AFC[, ..geo_AFC])
+    rownames(tab_conting)<- levels(data_AFC[, ..suj_AFC])
+    CFA(tab_conting)
+    })
   
 }
 

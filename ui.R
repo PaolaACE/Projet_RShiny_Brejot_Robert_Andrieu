@@ -114,7 +114,7 @@ fluidPage(
         sidebarPanel(
           title = "Analyses Factorielle des Correspondances",
           width = 20,
-          tableOutput(outputId = conting)
+          #tableOutput(outputId = conting)
         )
       )
     ),
