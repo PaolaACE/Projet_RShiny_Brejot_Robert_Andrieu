@@ -16,7 +16,8 @@ dashboardPage(
   # Sidebar (barre latérale)
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Présentation", tabName = "presentation", icon = icon("table")),
+      menuItem("Présentation", tabName = "presentation", icon = icon("info-circle")),
+      menuItem("Données", tabName = "donnees", icon = icon("table")),
       menuItem("Graphiques", tabName = "graph", icon = icon("chart-bar")),
       menuItem("Salaires", tabName = "salaire", icon = icon("euro-sign")),
       menuItem("Évolution temporelle", tabName = "evolution", icon = icon("line-chart")),
@@ -28,8 +29,14 @@ dashboardPage(
   dashboardBody(
     tabItems(
       
-      # Onglet Présentation
+      #Onglet Présentation
       tabItem(tabName = "presentation",
+              h1("Bienvenue dans l'application !"),
+              p("Cette application a pour but de démontrer comment utiliser shinydashboard.")
+      ),
+      
+      # Onglet Données
+      tabItem(tabName = "donnees",
               fluidRow(
                 box(width = 3, selectInput("var", "Sélectionnez des variables à visualiser : ", multiple = TRUE, choices = colnames(data), selected = c("annee", "etablissement", "discipline", "nombre_de_reponses"))),
                 box(width = 9, dataTableOutput("dataTable"))
