@@ -81,7 +81,7 @@ function(input, output, session) {
     filtered_data <- data2 %>% filter(academie %in% input$academie)
     
     ggplot(filtered_data, aes(x=annee, y=salaire_brut_annuel_estime, color=academie)) +
-      geom_line(size=1) +
+      geom_line(linewidth=1) +
       geom_point(size = 2) +
       labs(y = "Salaire (€)",
            x = "Année",
