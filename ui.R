@@ -5,6 +5,8 @@ library(DT)
 library(leaflet)
 library(dplyr) 
 library(tidygeocoder)
+library(factoextra)
+library(FactoMineR)
 
 source("Import_donnees.R")
 
@@ -18,18 +20,37 @@ dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Présentation", tabName = "presentation", icon = icon("info-circle")),
-      menuItem("Données", tabName = "donnees", icon = icon("table")),
-      menuItem("Graphiques", tabName = "graph", icon = icon("chart-bar")),
-      menuItem("Salaires", tabName = "salaire", icon = icon("euro-sign")),
-      menuItem("Évolution temporelle", tabName = "evolution", icon = icon("line-chart")),
-      menuItem("Carte", tabName = "carte", icon = icon("map")),
+      
+      menuItem("Visualisation", icon = icon("eye"), 
+               menuSubItem("Tableau", tabName = "donnees", icon = icon("table")),
+               menuSubItem("Répartitions", tabName = "graph", icon = icon("chart-bar")),
+               menuSubItem("Salaires", tabName = "salaire", icon = icon("euro-sign")),
+               menuSubItem("Évolution temporelle", tabName = "evolution", icon = icon("line-chart")),
+               menuSubItem("Carte", tabName = "carte", icon = icon("map"))
+      ),
+      menuItem("Analyses", icon = icon("calculator"),
+               menuSubItem("AFC sujet/localisation", tabName = "analyse_afc", icon = icon("project-diagram")),
+               menuSubItem("AFC salaires", tabName = "analyse_afc_locsal", icon = icon("project-diagram"))
+      ),
       menuItem("À propos des auteurs", tabName = "authors", icon = icon("users"))
     )
   ),
   
   # Corps de la page
   dashboardBody(
+    tags$head(
+      tags$style(
+        HTML('
+      .main-header .logo {
+        font-family: "Georgia", Times, "Times New Roman", serif;
+        font-weight: bold;
+        font-size: 24px;
+      }
+             ')
+      )
+    ),
     tabItems(
+      
       
       #Onglet Présentation
       tabItem(tabName = "presentation",
@@ -39,12 +60,15 @@ dashboardPage(
               
               
               h2("Visualisation"),
-              p("Plusieurs méthodes de visualisation des données sont proposées. Dans l'onglet Graphiques, on "),
-              p("L'onglet Carte permet de visualiser les localisations des académies et les taux de réponse et d'insertions dans chacune de ces acamédies."),
+              p("Plusieurs méthodes de visualisation des données sont proposées."),
+              p("Dans l'onglet Graphiques, on "),
+              p("L'onglet Carte permet de visualiser les localisations des académies et les taux de réponse et d'insertions dans chacune de ces acamédies. La carte est interactive, on observe les taux en cliquant sur les académies."),
+              p("L'onglet Salaires nous donne les moyennes de salaires en fonction de la variable qualitative choisie."),
+              p("L'onglet Evolution temporelle rend compte de l'évolution de certaines variables entre 2010 et 2020."),
               
               
               h2("Analyse"),
-              p("Notre analyse a pour but de déterminer..."),
+              p("Une première analyse, l'analyse factorielle des correspondances (AFC) entre les localisations et les domaines, permet de situer les académies ou les établissement les uns par rapport aux autres, en fonction de leurs spécialités."),
               
               
               h3("Données accessibles"),
@@ -126,13 +150,8 @@ dashboardPage(
       tabItem(tabName = "evolution",
               fluidRow(
                 box(width = 3, selectInput("academie", "Choisir les académies :", choices = unique(data$academie), selected = "Rennes", multiple = TRUE)),
-<<<<<<< HEAD
-                box(width = 5, selectInput("variable", "Choisir la variable :", choices = list("salaire_brut_annuel_estime", "taux_d_insertion"), selected = "salaire_brut_annuel_estime")),
-                box(width = 12, plotOutput("evolutionPlot"))
-=======
                 box(width = 5, selectInput("variable", "Choisir la variable :", choices = list("salaire_brut_annuel_estime", "taux_dinsertion", "taux_de_reponse"), selected = "salaire_brut_annuel_estime")),
                 box(width = 12, plotOutput("evolutionPlot")),
->>>>>>> f7a18662f477bd1f0952d77a646a8a139af52df9
               )
       ),
       # Onglet Carte
@@ -141,6 +160,77 @@ dashboardPage(
                 box(width = 12, leafletOutput("mymap", width = "100%", height = 600))
               )
       ),
+      
+      # Onglet AFC
+      tabItem(tabName = "analyse_afc",
+              sidebarLayout(
+                sidebarPanel(
+                  title = "Paramètres",
+                  width = 3,
+                  radioButtons(
+                    inputId = "geo_AFC",
+                    label = "Niveau géographique",
+                    choiceNames = list("Académie", "Etablissement"),
+                    choiceValues = list(2, 1),
+                    selected = 2
+                  ),
+                  radioButtons(
+                    inputId = "suj_AFC",
+                    label = "Niveau de précision du sujet",
+                    choiceNames = list("Domaine (5)", "Discipline (20)"),
+                    choiceValues = list(3, 4),
+                    selected = 3
+                  ),
+                  sliderInput(
+                    inputId = "an_AFC",
+                    label = "En quelle année?",
+                    value = 2015,
+                    min = 2010,
+                    max = 2020,
+                    round = TRUE,
+                    step = 1
+                  ),
+                  actionButton(inputId = "Hop", label = "Lancer l'AFC")
+                ),
+                mainPanel(
+                  title = "Analyse Factorielle des Correspondances",
+                  dataTableOutput(outputId = "Conting"),
+                  plotOutput(outputId = "plot_AFC"),
+                )
+              )
+      ),
+      
+      tabItem(tabName = "analyse_afc_locsal",
+              sidebarLayout(
+                sidebarPanel(
+                  title = "Paramètres",
+                  width = 3,
+                  radioButtons(
+                    inputId = "var_AFC",
+                    label = "Niveau géographique",
+                    choiceNames = list("Académie", "Etablissement","Domaine (5)", "Discipline (20)"),
+                    choiceValues = list(2, 1, 3, 4),
+                    selected = 2
+                  ),
+                  sliderInput(
+                    inputId = "annee_AFC",
+                    label = "En quelle année?",
+                    value = 2015,
+                    min = 2010,
+                    max = 2020,
+                    round = TRUE,
+                    step = 1
+                  ),
+                  actionButton(inputId = "Tac", label = "Lancer l'AFC")
+                ),
+                mainPanel(
+                  title = "Analyse Factorielle des Correspondances",
+                  dataTableOutput(outputId = "Contingence"),
+                  plotOutput(outputId = "plot_AFC_locsal")
+                )
+              )
+      ),
+      
       
       # Onglet À propos des auteurs
       tabItem(tabName = "authors",  

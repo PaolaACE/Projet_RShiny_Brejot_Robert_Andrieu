@@ -1,10 +1,17 @@
 
 function(input, output, session) {
   
-  # Sortie tableau des données
-  output$dataTable <- DT::renderDT(data[,input$var, with = FALSE])
+  # Sortie tableau des données ----
+  output$dataTable <- DT::renderDataTable({
+    DT::datatable(
+      data[,input$var, with = FALSE],
+      options = list(
+        scrollX = TRUE
+      )
+    )
+  })
   
-  # Boxplot des données quantitatives par domaine
+  # Boxplot des données quantitatives par domaine ----
   output$boxplot <- renderPlot({
     ggplot(data, aes(x = domaine, y = get(input$varnum))) +
       geom_boxplot() +
@@ -15,13 +22,13 @@ function(input, output, session) {
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
   })
   
-  # Salaire brut annuel moyen estimé par académie
+  # Salaire brut annuel moyen estimé par académie ----
   output$salaire_ac <- renderPlot({
     varfac = as.character(input$varfac)
     salaire_col = input$salaire
-    moyenne_par_academie <- data[, .(moyenne_salaire = mean(get(salaire_col), na.rm = TRUE)), by = varfac]
+    moyenne_par_varfac <- data[, .(moyenne_salaire = mean(get(salaire_col), na.rm = TRUE)), by = varfac]
     
-    ggplot(moyenne_par_academie, aes_string(x = varfac, y = "moyenne_salaire")) +
+    ggplot(moyenne_par_varfac, aes_string(x = varfac, y = "moyenne_salaire")) +
       geom_bar(stat = "identity", fill = "#0073B2", color = "black", width = 0.7) +
       labs(
         title = paste("Salaire moyen estimé par", varfac, "pour", salaire_col),
@@ -56,7 +63,7 @@ function(input, output, session) {
       )
   })
   
-  # Graphique d'évolution temporelle
+  # Graphique d'évolution temporelle ----
   output$evolutionPlot <- renderPlot({
     data2 <- if (input$variable == "salaire_brut_annuel_estime") {
       data[!is.na(salaire_brut_annuel_estime)] %>%
@@ -83,7 +90,7 @@ function(input, output, session) {
     } else if (input$variable == "taux_de_reponse"){
       "Taux de réponse (%)"
     }
-      
+    
     ggplot(filtered_data, aes(x = annee, y = value, color = academie)) +
       geom_line(size = 1) +
       geom_point(size = 2) +
@@ -101,5 +108,135 @@ function(input, output, session) {
         }
       )
   })
+  
+  # Analyse Factorielle des correspondances entre Localisation et Domaine ----
+  observeEvent(input$Hop, {
+    
+    # On récupère les valeurs des index
+    Geo_AFC <- as.numeric(input$geo_AFC)
+    Suj_AFC <- as.numeric(input$suj_AFC)
+    An_AFC <- as.numeric(input$an_AFC)
+    
+    # On filtre les données
+    data_AFC <- data[annee == An_AFC, c(4, 7, 9, 11, 14)]
+    
+    geo <- data_AFC[, ..Geo_AFC][[1]]
+    data_AFC[, geographie := geo]
+    
+    suj <- data_AFC[, ..Suj_AFC][[1]]
+    data_AFC[, sujet := suj]
+    
+    modalites_suj <- levels(data_AFC[, sujet])
+    modalites_geo <- levels(data_AFC[, geographie])
+    
+    I <- length(modalites_geo)
+    J <- length(modalites_suj)
+    
+    Conting <- matrix(data = NA, nrow = J, ncol = I)
+    
+    for (i in 1:I) {
+      for (j in 1:J) {
+        mod_i <- as.character(modalites_geo[i])
+        mod_j <- as.character(modalites_suj[j])
+        dta_eph <- data_AFC[(geographie == mod_i) & (sujet == mod_j), nombre_de_reponses]
+        donnee <- sum(dta_eph)
+        Conting[j, i] <- donnee
+      }
+    }
+    
+    tab_conting <- data.frame(Conting)
+    rownames(tab_conting) <- as.character(modalites_suj)
+    colnames(tab_conting) <- as.character(modalites_geo)
+    
+    # Tableau de contingence
+    output$Conting <- DT::renderDataTable({
+      DT::datatable(
+        tab_conting,
+        options = list(
+          scrollX = TRUE
+        )
+      )
+    })
+    
+    AFC <- CA(tab_conting)
+    
+    # Graphe de l'AFC 
+    output$plot_AFC <- renderPlot({
+      fviz_ca_biplot(AFC, repel = TRUE) +
+        theme_minimal() +
+        ggtitle("Analyse Factorielle des Correspondances")
+    })
+  })
+  
+  
+  # Analyse Factorielle des correspondances entre Localisation et Salaire ----
+  observeEvent(input$Tac, {
+    
+    # Créer les intervalles basés sur les quantiles
+    data$salaire_categ_quantiles <- cut(data$salaire_brut_annuel_estime, 
+                                        breaks = quantile(data$salaire_brut_annuel_estime, 
+                                                          probs = c(0, 1/3, 2/3, 1), 
+                                                          na.rm = TRUE),
+                                        labels = c("Faible", "Moyen", "Élevé"), 
+                                        include.lowest = TRUE)
+    
+    # Vérifier la répartition des effectifs dans chaque catégorie
+    table(data$salaire_categ_quantiles)
+    
+    # On récupère les valeurs des index
+    Var_AFC <- as.numeric(input$var_AFC)
+    An_AFC <- as.numeric(input$annee_AFC)
+    
+    # On filtre les données
+    data_AFC <- data[annee == An_AFC,c(4, 7, 9, 11, 14,36)]
+    
+    var <- data_AFC[, ..Var_AFC][[1]]
+    data_AFC[, variable_int := var]
+    
+    
+    modalites_sal <- levels(data_AFC$salaire_categ_quantiles)
+    modalites_suj <- levels(data_AFC[, variable_int])
+    
+    I <- length(modalites_sal)
+    J <- length(modalites_suj)
+    
+    Conting <- matrix(data = NA, nrow = J, ncol = I)
+    
+    for (i in 1:I) {
+      for (j in 1:J) {
+        mod_i <- as.character(modalites_sal[i])
+        mod_j <- as.character(modalites_suj[j])
+        dta_eph <- data_AFC[(salaire_categ_quantiles == mod_i) & (variable_int == mod_j), nombre_de_reponses]
+        donnee <- sum(dta_eph)
+        Conting[j, i] <- donnee
+      }
+    }
+    
+    tab_conting <- data.frame(Conting)
+    rownames(tab_conting) <- as.character(modalites_suj)
+    colnames(tab_conting) <- as.character(modalites_sal)
+    
+    # Tableau de contingence
+    output$Contingence <- DT::renderDataTable({
+      DT::datatable(
+        tab_conting,
+        options = list(
+          scrollX = TRUE
+        )
+      )
+    })
+    
+    AFC <- CA(tab_conting)
+    
+    # Graphe de l'AFC
+    output$plot_AFC_locsal <- renderPlot({
+      fviz_ca_biplot(AFC, repel = TRUE) +
+        theme_minimal() +
+        ggtitle("Analyse Factorielle des Correspondances")
+    })
+    
+  })
+  
+  
 }
 
