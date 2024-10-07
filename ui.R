@@ -79,7 +79,7 @@ fluidPage(
       sidebarLayout(
         sidebarPanel(
           title = "Paramètres",
-          width = 5,
+          width = 3,
           
           radioButtons(
             inputId = "geo_AFC",
@@ -113,9 +113,11 @@ fluidPage(
         ), 
         sidebarPanel(
           title = "Analyses Factorielle des Correspondances",
-          width = 20,
-          tableOutput(outputId = "Conting")
-        )
+          width =6,
+          tableOutput(outputId = "Conting"), 
+          plotOutput(outputId = "plot_AFC")
+        ),
+
       )
     ),
       
@@ -134,5 +136,4 @@ fluidPage(
   )
   
 )
-
 
