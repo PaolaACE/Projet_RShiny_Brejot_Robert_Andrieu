@@ -5,6 +5,7 @@ library(shiny)
 library(car)
 library(FactoMineR)
 library(Factoshiny)
+library(emmeans)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
@@ -30,6 +31,7 @@ function(input, output, session) {
   dta_trie <- dta_trie[etablissement != "Toutes universités et établissements assimilés"]
 
   observeEvent(input$Go, {
+    
     a1 <- reactive({input$an[1]})
     A1 <- as.numeric(a1())
     a2 <- reactive({input$an[2]})
@@ -43,27 +45,30 @@ function(input, output, session) {
     
     Suj <- reactive({input$sujet})
     s <- as.numeric(Suj())
-    S <- dta_a[,..s][[1]]
+    S <- dta_trie[,..s][[1]]
     noms_s <- levels(s)
     
     YA <- reactive({input$Y})
     y <- as.numeric(YA())
-    Y2 <- dta_a[,..y][[1]]
+    Y2 <- dta_trie[,..y][[1]]
     Y2 <- as.character(Y2)
     Y <- sapply(Y2, as.numeric)
     
-    Fe <- dta_a$femmes
+    Fe <- dta_trie$femmes
     Fe <- as.numeric(Fe)
     F0 <- rep(NA, length(Fe))
     
     coeffs_geo <- data.frame(lieu = noms_g)
     coeffs_suj <- data.frame(sujet = noms_s)
+    iter = 1
+    
+    res.em <- c()
     
     for (a in A1:A2){
         # on considère les donnees annee par annee entre les deux annees 
       #selectionnees
-
-       dta_a <- dta_trie[annee==a]
+      iter <- iter+1
+      dta_a <- dta_trie[annee==a,]
       
       #on cree des listes liees aux parametres selectionnes par l'utilisateur
 
@@ -100,13 +105,12 @@ function(input, output, session) {
                      G:S + G:Fe + S:Fe +
                      G:S:Fe)
       }
-      Coefs_Geo <- coefficients(mod)[1]
-    
-      res.aov <- c(res.aov, a,
-                   coef(mod))
+      # coeffs_geo[,iter+1] <- emmeans(mod, ~G)[,4]
+      # coeffs_suj[,iter+1] <- emmeans(mod, ~S)[,4]
+      em <- emmeans(mod, ~G)
       }
     
-    output$aov <- renderPrint({res.aov})
+    output$res <- renderPrint({em})
     
   })
   
@@ -114,7 +118,7 @@ function(input, output, session) {
 
   observeEvent(input$Hop, {
 
-    #on recupere les valeurs
+    #on recupere les valeurs des index
 
     Geo_AFC <- (reactive({input$geo_AFC}))
     geo_AFC <- as.numeric(Geo_AFC())
@@ -125,30 +129,29 @@ function(input, output, session) {
     An_AFC <- (reactive({input$an_AFC}))
     an_AFC <- as.numeric(An_AFC())
     
-    data_AFC <- data[annee = an_AFC ,c(4,7,9,11,14)]
+    data_AFC <- data[annee == an_AFC, c(4,7,9,11,14)]
 
-    I <- length(data_AFC[, ..geo_AFC])
-    J <- length(data_AFC[, ..suj_AFC])
+    I <- length(levels(data_AFC[, ..geo_AFC][[1]]))
+    J <- length(levels(data_AFC[, ..suj_AFC][[1]]))
 
     Conting <- matrix(data=NA, nrow = I, ncol = J)
 
-
-
     for (i in 1:I){
-      for (j in levels(data[,..geo_AFC])){
+      for (j in 1:J){
         #on stocke les modalites associees en terme de sujet et de geographie
-        mod_i = levels(data[,..suj_AFC])
-        mod_j = levels(data[,..geo_AFC])
-        dta_cherche <- sum(data[annee == a_AFC&..suj_AFC == mod_i&..geo_AFC == j])
-        Conting[i, j] <- dta_cherche
+        mod_i <- levels(data_AFC[,..geo_AFC][[1]])[i]
+        mod_j <- levels(data_AFC[,..suj_AFC][[1]])[j]
+        dta_eph <- data_AFC[..suj_AFC == mod_i&..geo_AFC == j]
+        donnee <- sum(dta_eph[,nombre_de_reponses])
+        Conting[i, j] <- donnee
       }
     }
 
-    output$Conting <- renderTable({Conting})
     tab_conting <- data.frame(Conting)
-    colnames(tab_conting)<- levels(data_AFC[, ..geo_AFC])
-    rownames(tab_conting)<- levels(data_AFC[, ..suj_AFC])
-    CFA(tab_conting)
+    colnames(tab_conting) <- levels(data_AFC[, ..geo_AFC])
+    rownames(tab_conting) <- levels(data_AFC[, ..suj_AFC])
+    output$Conting <- renderTable({Conting})
+    #CFA(tab_conting)
     })
   
 }

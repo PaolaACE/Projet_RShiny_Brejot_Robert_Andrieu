@@ -70,7 +70,7 @@ fluidPage(
         sidebarPanel(
           title = "Analyses de la variance sur la période souhaitée",
           width = 20,
-          verbatimTextOutput(outputId = "aov")
+          verbatimTextOutput(outputId = "res")
         )
       )
     ),
@@ -85,16 +85,16 @@ fluidPage(
             inputId = "geo_AFC",
             label = "Niveau geographique",
             choiceNames = list("Académie", "Etablissement"),
-            choiceValues = list(3, 2), 
-            selected = 1
+            choiceValues = list(2,1), 
+            selected = 2
           ),
           
           radioButtons(
-            inputId = "sujet_AFC",
+            inputId = "suj_AFC",
             label = "Niveau de précision du sujet",
             choiceNames = list("Domaine (5)", "Discipline(20)"),
-            choiceValues = list(4,5), 
-            selected = 1
+            choiceValues = list(3,4), 
+            selected = 3
           ), 
           
           sliderInput(
@@ -114,7 +114,7 @@ fluidPage(
         sidebarPanel(
           title = "Analyses Factorielle des Correspondances",
           width = 20,
-          #tableOutput(outputId = conting)
+          tableOutput(outputId = "Conting")
         )
       )
     ),
