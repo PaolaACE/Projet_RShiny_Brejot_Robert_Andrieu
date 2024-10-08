@@ -279,6 +279,7 @@ dashboardPage(
                   p("Cet onglet vous permet d'explorer les associations entre les salaires et les académies, 
         les établissements, ainsi que les domaines ou disciplines, en fonction des données 
         fournies."),
+                  p("La variable salaire_brut_annuel_estime est convertie en variable catégrielle à 3 classes : Faible, Moyen, Elevé. Ces 3 classes sont équilibrées et ont pour valeurs limites 27900 et 49100."),
                   dataTableOutput(outputId = "Contingence"),
                   plotOutput(outputId = "plot_AFC_locsal")
                 )
