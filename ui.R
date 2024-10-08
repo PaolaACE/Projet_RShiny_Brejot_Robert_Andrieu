@@ -59,8 +59,8 @@ dashboardPage(
       tabItem(tabName = "presentation",
               h1("Insertion des diplômés de Master"),
               p("Cette application a pour but d'étudier les données de l'insertion des diplômés dans le marché du travail.
-                Les données étudiées sont collectéesdans le cadre de l'opération nationale de collecte de données sur l’insertion professionnelle des diplômés de Master.
-                Elles complilent un certain nombre d'informations sur la situation actuelle de diplômé en Master, par année, par établissement, par académie...
+                Les données étudiées sont collectées dans le cadre de l'opération nationale de collecte de données sur l’insertion professionnelle des diplômés de Master.
+                Elles compilent un certain nombre d'informations sur la situation actuelle de diplômé en Master, par année, par établissement, par académie...
                 Un individu du tableau correspond à des informations sur l'insertion professionnelle d'une promotion (correspondant à un établissement, une année, 18mois ou 30 mois après le diplôme), les nombres et taux de réponses étant précisés."),
               
               
@@ -72,12 +72,12 @@ dashboardPage(
                 tags$li("L'onglet Répartitions nous permet d'observer la répartition des variables quantitatives en fonction des différents domaines. "),
                 tags$li("L'onglet Salaires nous donne les moyennes de salaires en fonction de la variable qualitative choisie."),
                 tags$li("L'onglet Evolution temporelle rend compte de l'évolution de certaines variables entre 2010 et 2020."),
-                tags$li("L'onglet Carte permet de visualiser les localisations des académies et les taux de réponse et d'insertions dans chacune de ces acamédies. La carte est interactive, on observe les taux en cliquant sur les académies.")
+                tags$li("L'onglet Carte permet de visualiser les localisations des académies et les taux de réponse et d'insertion dans chacune de ces acamédies. La carte est interactive, on observe les taux en cliquant sur les académies.")
               ),
               
               h2("Analyse"),
               tags$ol(
-                tags$li("Une première analyse, l'analyse factorielle des correspondances (AFC) entre les localisations et les domaines, permet de situer les académies ou les établissement les uns par rapport aux autres, en fonction de leurs spécialités."),
+                tags$li("Une première analyse, l'analyse factorielle des correspondances (AFC) entre les localisations et les domaines, permet de situer les académies ou les établissements les uns par rapport aux autres, en fonction de leurs spécialités."),
                 tags$li("Une seconde analyse par AFC rend compte des relations entre les niveaux de salaires et les variables géographiques ou de sujet."),
                 tags$li("Une analyse de la variance permet d'étudier l'impact des différentes variables sur le salaire brut annuel estimé, le taux d'emploi ou le taux d'insertion")
               ),
@@ -93,7 +93,7 @@ dashboardPage(
                 tags$li(tags$strong("diplome"), " : Le type de diplôme obtenu par les diplômés : Master ENS ou LMD."),
                 tags$li(tags$strong("numero_de_l_etablissement"), " : Le numéro d'identification de l'établissement."),
                 tags$li(tags$strong("etablissement"), " : Nom de l'établissement."),
-                tags$li(tags$strong("etablissementactuel"), " : L'établissement où les diplômés ont été formés actuellement."),
+                tags$li(tags$strong("etablissementactuel"), " : L'établissement où les diplômés sont actuellement."),
                 tags$li(tags$strong("code_de_l_academie"), " : Le code de l'académie."),
                 tags$li(tags$strong("academie"), " : Nom de l'académie à laquelle appartient l'établissement."),
                 tags$li(tags$strong("code_du_domaine"), " : Le code du domaine d'étude."),
@@ -105,7 +105,7 @@ dashboardPage(
                 tags$li(tags$strong("nombre_de_reponses"), " : Nombre total de réponses reçues pour chaque question."),
                 tags$li(tags$strong("taux_de_reponse"), " : Pourcentage de réponse des diplômés."),
                 tags$li(tags$strong("poids_de_la_discipline"), " : Poids attribué à chaque discipline dans l'analyse."),
-                tags$li(tags$strong("taux_dinsertion"), " : Le taux d’insertion est défini comme étant le pourcentage de diplômés occupant un emploi, quel qu’il soit, sur l’ensemble des diplômés présents sur le marché du travail. Il est calculé sur les diplômés de nationalité française, issus de la formation initiale, entrés immédiatement et durablement sur le marché du travail après l’obtention de leur diplôme en 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 ou 2020."),
+                tags$li(tags$strong("taux_dinsertion"), " : Le taux d’insertion est défini comme étant le pourcentage de diplômés occupant un emploi, quel qu’il soit, sur l’ensemble des diplômés présents sur le marché du travail. Il est calculé sur les diplômés de nationalité française, issus de la formation initiale, entrés immédiatement et durablement sur le marché du travail après l’obtention de leur diplôme entre 2011 et 2020."),
                 tags$li(tags$strong("taux_d_emploi"), " : Taux d'emploi : part des diplômés en emploi parmi l'ensemble des diplômés actifs (en emploi ou en recherche) ou inactifs."),
                 tags$li(tags$strong("taux_d_emploi_salarie_en_france"), " : Taux d'emploi salarié en France."),
                 tags$li(tags$strong("emplois_cadre_ou_professions_intermediaires"), " : Nombre d'emplois occupés par des cadres ou des professions intermédiaires."),
@@ -136,7 +136,7 @@ dashboardPage(
                     h3("Sélectionnez les Variables"),
                     p("Dans cet onglet, vous pouvez sélectionner plusieurs variables 
               à visualiser dans le tableau. Utilisez le sélecteur ci-dessous pour 
-              choisir les variables d'intérêt. Le tableau affichera les données 
+              choisir les variables d'intérêts. Le tableau affichera les données 
               correspondantes aux variables sélectionnées."),
                     selectInput("var", "Sélectionnez des variables à visualiser : ", multiple = TRUE, choices = colnames(data), selected = c("annee", "etablissement", "discipline", "nombre_de_reponses"))),
                 box(width = 9, dataTableOutput("dataTable"))
@@ -364,7 +364,7 @@ dashboardPage(
                                box(title = "Amélie Brejot", 
                                    status = "info", 
                                    solidHeader = TRUE,
-                                   p("Email : amelie.brejot@example.com")                               )
+                                   p("Email : amelie.brejot56@gmail.com")                               )
                         ),
                         column(width = 6,
                                box(title = "Augustin Robert", 
