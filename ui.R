@@ -255,7 +255,7 @@ dashboardPage(
                   width = 3,
                   radioButtons(
                     inputId = "var_AFC",
-                    label = "Niveau géographique",
+                    label = "Variable",
                     choiceNames = list("Académie", "Etablissement","Domaine (5)", "Discipline (20)"),
                     choiceValues = list(2, 1, 3, 4),
                     selected = 2
