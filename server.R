@@ -206,7 +206,8 @@ function(input, output, session) {
                                                           na.rm = TRUE),
                                         labels = c("Faible", "Moyen", "Élevé"), 
                                         include.lowest = TRUE)
-    
+    quantiles <- quantile(data$salaire_brut_annuel_estime, probs = c(0, 1/3, 2/3, 1), na.rm = TRUE)
+    print(quantiles)
     # Vérifier la répartition des effectifs dans chaque catégorie
     table(data$salaire_categ_quantiles)
     
